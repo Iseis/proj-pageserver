@@ -84,7 +84,7 @@ def respond(sock):
 			
         transmit(response, sock)
     else:
-        transmit("\nI don't handle this request: {}\n".format(request), sock)
+        transmit("\nI don't handle this request: {}\n".format(request).encode(), sock)
 
     sock.close()
 
