@@ -66,11 +66,23 @@ def respond(sock):
     request = sock.recv(1024)  # We accept only short requests
     request = str(request, encoding='utf-8', errors='strict')
     print("\nRequest was {}\n".format(request))
-
     parts = request.split()
-    if len(parts) > 1 and parts[0] == "GET":
-        transmit("HTTP/1.0 200 OK\n\n", sock)
-        transmit(CAT, sock)
+
+    if len(parts) > 1 and parts[0] == "GET" and '.html' in parts[1]:
+       
+        ## Get the file
+        try:
+            transmit("HTTP/1.0 200 OK\n\n".encode(), sock)
+            file_handler = open(parts[1], 'rb')
+            response = file_handler.read()
+            file_handler.close()
+		
+        except Exception as e: #in case file not found
+            print("Error file not found sending 404 error\n", e)
+            transmit("HTTP/1.0  404 Not Found\n\n".encode(), sock)
+            response = "<html><body><p>Error 404: File not found</p><p> Python HTTP server</p></body></html>"
+			
+        transmit(response, sock)
     else:
         transmit("\nI don't handle this request: {}\n".format(request), sock)
 
@@ -80,10 +92,7 @@ def respond(sock):
 
 def transmit(msg, sock):
     """It might take several sends to get the whole buffer out"""
-    sent = 0
-    while sent < len(msg):
-        buff = bytes( msg[sent: ], encoding="utf-8")
-        sent += sock.send( buff )
+    sock.send( msg )
     
 
 def main():
