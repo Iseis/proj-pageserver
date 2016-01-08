@@ -68,7 +68,8 @@ def respond(sock):
     print("\nRequest was {}\n".format(request))
     parts = request.split()
 
-    if len(parts) > 1 and parts[0] == "GET" and '.html' in parts[1]:
+    #Check if we handle the request
+    if len(parts) > 1 and parts[0] == "GET" and checkForValidFile(parts[1]):
        
         ## Get the file
         try:
@@ -76,13 +77,14 @@ def respond(sock):
             file_handler = open(parts[1], 'rb')
             response = file_handler.read()
             file_handler.close()
+            transmit(response, sock)
 		
         except Exception as e: #in case file not found
             print("Error file not found sending 404 error\n", e)
-            transmit("HTTP/1.0  404 Not Found\n\n".encode(), sock)
-            response = "<html><body><p>Error 404: File not found</p><p> Python HTTP server</p></body></html>"
+            response = "HTTP/1.0  404 Not Found\n".encode()
+            response += b"Error 404: File not found: Python HTTP server"
+            transmit(response, sock)
 			
-        transmit(response, sock)
     else:
         transmit("\nI don't handle this request: {}\n".format(request).encode(), sock)
 
@@ -93,6 +95,25 @@ def respond(sock):
 def transmit(msg, sock):
     """It might take several sends to get the whole buffer out"""
     sock.send( msg )
+    
+#Checks if file part of url is valid
+def checkForValidFile(f):
+    isValid = False
+    
+    #if html file and is in same directory as server
+    if '.html' in f:
+       isValid = True
+    
+    #if css file and is in same directory as server
+    if '.css' in f:
+       isValid = True
+    
+    #Check for invalid characters in file name
+    if '//' in f or '..' in f or '~' in f:
+       isValid = False
+       
+    return isValid
+       
     
 
 def main():
