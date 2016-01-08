@@ -1,4 +1,9 @@
 # README #
+# NAME #
+Andrew Owens
+
+# PATH on IX #
+http://ix.cs.uoregon.edu/~andrewo/uoregon-cis399/proj-pageserver/pageserve_skel.py
 
 A "getting started" project for CIS 322, software engineering 1 at University of Oregon.
 
